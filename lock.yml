@@ -1,0 +1,43 @@
+header:
+  version: 14
+repos:
+  bitbake:
+    branch: master
+    commit: cdd79c1768ac396a9c6577e38098da4331507f24
+    url: https://github.com/openembedded/bitbake
+  meta-audioreach:
+    branch: master
+    commit: 01e975fbd698a0654a3795e6416db6126027cd78
+    url: https://github.com/AudioReach/meta-audioreach
+  meta-openembedded:
+    branch: master
+    commit: 7bbe4a4e200452b1fd6c09c7fcf36c4b229146f6
+    url: https://github.com/openembedded/meta-openembedded
+  meta-qcom:
+    branch: master
+    commit: b0f392959c5bbe89dd9671813f5e1b5037e89aae
+    url: https://github.com/qualcomm-linux/meta-qcom
+  meta-qcom-distro:
+    branch: main
+    commit: 0cbe7e4246e14fd3763708db15b42e6a5342e5c2
+    url: https://github.com/qualcomm-linux/meta-qcom-distro
+  meta-selinux:
+    branch: master
+    commit: 9d35a82eea94467f76669763717939c3165eba32
+    url: https://git.yoctoproject.org/meta-selinux
+  meta-updater:
+    branch: master
+    commit: b38fd8a52918f063c2507d11347b36fd1892260e
+    url: https://github.com/uptane/meta-updater
+  meta-virtualization:
+    branch: master
+    commit: 28d26fd95397bf575e65fcca0cbb302b1e9bc7ff
+    url: https://git.yoctoproject.org/git/meta-virtualization
+  meta-yocto:
+    branch: master
+    commit: de4abc0a175af12eacc761a2e1e60ca7fdfeaa1b
+    url: https://git.yoctoproject.org/meta-yocto
+  oe-core:
+    branch: master
+    commit: 58b9f90779d1227e30a7de4948b10e49fb5b5ac1
+    url: https://github.com/openembedded/openembedded-core
