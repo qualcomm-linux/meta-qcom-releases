@@ -1,0 +1,162 @@
+#!/bin/sh
+
+# Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+
+set -e
+
+usage() {
+  cat <<'EOF'
+Usage:
+  source setup-environment --machine <machine.yml> --distro <distro.yml> [--kernel <kernel.yml>]
+
+Options:
+  -m, --machine   Path to MACHINE kas configuration file (required)
+  -d, --distro    Path to DISTRO kas configuration file (required)
+  -k, --kernel    Path to KERNEL kas configuration file (optional)
+  -h, --help      Show this help
+
+Examples:
+  bash:
+    source setup-environment --machine meta-qcom/ci/qcs9100-ride-sx.yml --distro meta-qcom/ci/qcom-distro.yml
+
+  dash:
+    set -- -m meta-qcom/ci/qcs9100-ride-sx.yml -d meta-qcom/ci/qcom-distro.yml -k meta-qcom/ci/linux-qcom-6.18.yml
+    . ./setup-environment
+EOF
+}
+
+log() {
+  echo "$1: $2"
+  if [ "$1" = "ERROR" ]; then
+    exit 1
+  fi
+}
+
+# Parse --flags and populate MACHINE/DISTRO/KERNEL variables
+parse_args() {
+  MACHINE=""
+  DISTRO=""
+  KERNEL=""
+
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      -m|--machine)
+        [ $# -ge 2 ] || { echo "ERROR: --machine requires a value"; usage; return 1; }
+        MACHINE="$2"
+        shift 2
+        ;;
+      -d|--distro)
+        [ $# -ge 2 ] || { echo "ERROR: --distro requires a value"; usage; return 1; }
+        DISTRO="$2"
+        shift 2
+        ;;
+      -k|--kernel)
+        [ $# -ge 2 ] || { echo "ERROR: --kernel requires a value"; usage; return 1; }
+        KERNEL="$2"
+        shift 2
+        ;;
+      -h|--help)
+        usage
+        exit 0
+        ;;
+      -*)
+        echo "ERROR: Unknown option: $1"
+        usage
+        return 1
+        ;;
+      *)
+        echo "ERROR: Unexpected positional argument: $1"
+        usage
+        return 1
+        ;;
+    esac
+  done
+}
+
+validation_checks() {
+  if [ -z "$MACHINE" ]; then
+    log "ERROR" "MACHINE needs to be set (use --machine <file>)"
+  fi
+
+  if [ -z "$DISTRO" ]; then
+    log "ERROR" "DISTRO needs to be set (use --distro <file>)"
+  fi
+
+  if [ -n "$KERNEL" ] && [ ! -f "$KERNEL" ]; then
+    log "ERROR" "KERNEL needs to point to a kas configuration file"
+  fi
+
+  if [ ! -f "$MACHINE" ]; then
+    log "ERROR" "MACHINE needs to point to a kas configuration file"
+  fi
+
+  if [ ! -f "$DISTRO" ]; then
+    log "ERROR" "DISTRO needs to point to a kas configuration file"
+  fi
+}
+
+parse_env_vars() {
+  python3 -c "
+import yaml
+try:
+  with open('$1') as f:
+    config = yaml.safe_load(f)
+except Exception as e:
+  print('Failed to parse {}: {}'.format('$1', e))
+  exit(1)
+env_vars = config.get('env', {})
+for key, value in env_vars.items():
+  print('export {}=\"{}\"'.format(key, value))
+  "
+}
+
+cleanup() {
+  [ -f .config.yaml ] && rm .config.yaml
+  unset MACHINE DISTRO KERNEL CONFIG_FILES
+}
+
+init_env() {
+  parse_args "$@" || return $?
+
+  log "INFO" "Running validation checks."
+  validation_checks
+
+  CONFIG_FILES="$MACHINE:$DISTRO"
+  if [ -n "$KERNEL" ]; then
+    CONFIG_FILES="$CONFIG_FILES:$KERNEL"
+  fi
+
+  # invoking kas shell should auto-generate BitBake configuration
+  # based on the kas local_conf_header
+  log "INFO" "Setting up bitbake configuration."
+  kas -l error shell \
+    --skip repo_setup_loop \
+    --skip finish_setup_repos \
+    --skip repos_checkout \
+    --skip repos_apply_patches \
+    "$CONFIG_FILES" -c "exit 0" || (cleanup && log "ERROR" "Failure during bitbake configuration setup.")
+
+  # parse and generate kas configuration
+  log "INFO" "Generating temporary kas configuration."
+  kas -l error dump \
+    --skip repo_setup_loop \
+    --skip finish_setup_repos \
+    --skip repos_checkout \
+    --skip repos_apply_patches \
+    "$CONFIG_FILES" > .config.yaml || (cleanup && log "ERROR" "Failure while parsing kas configuration.")
+
+  log "INFO" "Exporting environment variables from kas configuration."
+  eval "$(parse_env_vars .config.yaml)" || (cleanup && log "ERROR" "Failure during environment variable setup.")
+
+  log "INFO" "Cleaning up temporary contents."
+  cleanup
+
+  log "INFO" "Initializing bitbake environment."
+  # switch to oe-core directory, so oe-init-build-env can figure out OEROOT correctly
+  cd  "${PWD}/oe-core"
+  set -- "$PWD/build"
+  . "$PWD/oe-init-build-env"
+}
+
+init_env "$@"
