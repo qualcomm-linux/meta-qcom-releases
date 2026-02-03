@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<manifest>
+  <default revision="master" sync-j="4" clone-depth="1" fetch="true"/>
+  <project name="openembedded/bitbake" path="bitbake" revision="cdd79c1768ac396a9c6577e38098da4331507f24" remote="github-com" upstream="refs/heads/master"/>
+  <project name="AudioReach/meta-audioreach" path="meta-audioreach" revision="01e975fbd698a0654a3795e6416db6126027cd78" remote="github-com" upstream="refs/heads/master"/>
+  <project name="openembedded/meta-openembedded" path="meta-openembedded" revision="7bbe4a4e200452b1fd6c09c7fcf36c4b229146f6" remote="github-com" upstream="refs/heads/master"/>
+  <project name="qualcomm-linux/meta-qcom" path="meta-qcom" revision="b0f392959c5bbe89dd9671813f5e1b5037e89aae" remote="github-com" upstream="refs/heads/master"/>
+  <project name="qualcomm-linux/meta-qcom-distro" path="meta-qcom-distro" revision="0cbe7e4246e14fd3763708db15b42e6a5342e5c2" remote="github-com" upstream="refs/heads/main"/>
+  <project name="meta-selinux" path="meta-selinux" revision="9d35a82eea94467f76669763717939c3165eba32" remote="git-yoctoproject-org" upstream="refs/heads/master"/>
+  <project name="uptane/meta-updater" path="meta-updater" revision="b38fd8a52918f063c2507d11347b36fd1892260e" remote="github-com" upstream="refs/heads/master"/>
+  <project name="git/meta-virtualization" path="meta-virtualization" revision="28d26fd95397bf575e65fcca0cbb302b1e9bc7ff" remote="git-yoctoproject-org" upstream="refs/heads/master"/>
+  <project name="meta-yocto" path="meta-yocto" revision="de4abc0a175af12eacc761a2e1e60ca7fdfeaa1b" remote="git-yoctoproject-org" upstream="refs/heads/master"/>
+  <project name="openembedded/openembedded-core" path="oe-core" revision="58b9f90779d1227e30a7de4948b10e49fb5b5ac1" remote="github-com" upstream="refs/heads/master"/>
+  <project name="qualcomm-linux/meta-qcom-releases" path="meta-qcom-releases" revision="refs/heads/master" remote="github-com" upstream="refs/heads/master">
+   <linkfile dest="setup-environment" src="setup-environment"/>
+  </project>
+  <remote name="github-com" fetch="https://github.com/"/>
+  <remote name="git-yoctoproject-org" fetch="https://git.yoctoproject.org/"/>
+</manifest>
