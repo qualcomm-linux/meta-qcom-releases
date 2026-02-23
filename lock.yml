@@ -11,11 +11,11 @@ repos:
     url: https://github.com/AudioReach/meta-audioreach
   meta-openembedded:
     branch: master
-    commit: e19775fba85e966d482ac7bee933754863e3acfe
+    commit: 4d60ca97ec2f0a7a22ac35a97f716544b54fbe39
     url: https://github.com/openembedded/meta-openembedded
   meta-qcom:
     branch: master
-    commit: 49bc2113adb0b86d463c311d32d4fb1007fe4845
+    commit: daf8c98ae0042b53140ea7f335cf8516eecf1fce
     url: https://github.com/qualcomm-linux/meta-qcom
   meta-qcom-distro:
     branch: main
