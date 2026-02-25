@@ -154,8 +154,8 @@ init_env() {
 
   log "INFO" "Initializing bitbake environment."
   # switch to oe-core directory, so oe-init-build-env can figure out OEROOT correctly
-  cd  "${PWD}/oe-core"
   set -- "$PWD/build"
+  cd  "${PWD}/oe-core"
   . "$PWD/oe-init-build-env"
 }
 
