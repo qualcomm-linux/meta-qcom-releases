@@ -24,13 +24,6 @@ Examples:
 EOF
 }
 
-log() {
-  echo "$1: $2"
-  if [ "$1" = "ERROR" ]; then
-    exit 1
-  fi
-}
-
 # Parse --flags and populate MACHINE/DISTRO/KERNEL variables
 parse_args() {
   MACHINE=""
@@ -74,23 +67,28 @@ parse_args() {
 
 validation_checks() {
   if [ -z "$MACHINE" ]; then
-    log "ERROR" "MACHINE needs to be set (use --machine <file>)"
+    echo "ERROR: MACHINE needs to be set (use --machine <file>)"
+    return 1
   fi
 
   if [ -z "$DISTRO" ]; then
-    log "ERROR" "DISTRO needs to be set (use --distro <file>)"
+    echo "ERROR: DISTRO needs to be set (use --distro <file>)"
+    return 1
   fi
 
   if [ -n "$KERNEL" ] && [ ! -f "$KERNEL" ]; then
-    log "ERROR" "KERNEL needs to point to a kas configuration file"
+    echo "ERROR: KERNEL needs to point to a kas configuration file"
+    return 1
   fi
 
   if [ ! -f "$MACHINE" ]; then
-    log "ERROR" "MACHINE needs to point to a kas configuration file"
+    echo "ERROR: MACHINE needs to point to a kas configuration file"
+    return 1
   fi
 
   if [ ! -f "$DISTRO" ]; then
-    log "ERROR" "DISTRO needs to point to a kas configuration file"
+    echo "ERROR: DISTRO needs to point to a kas configuration file"
+    return 1
   fi
 }
 
@@ -117,8 +115,8 @@ cleanup() {
 init_env() {
   parse_args "$@" || return $?
 
-  log "INFO" "Running validation checks."
-  validation_checks
+  echo "INFO: Running validation checks."
+  validation_checks || return $?
 
   CONFIG_FILES="$MACHINE:$DISTRO"
   if [ -n "$KERNEL" ]; then
@@ -127,30 +125,45 @@ init_env() {
 
   # invoking kas shell should auto-generate BitBake configuration
   # based on the kas local_conf_header
-  log "INFO" "Setting up bitbake configuration."
+  echo "INFO: Setting up bitbake configuration."
   kas -l error shell \
     --skip repo_setup_loop \
     --skip finish_setup_repos \
     --skip repos_checkout \
     --skip repos_apply_patches \
-    "$CONFIG_FILES" -c "exit 0" || (cleanup && log "ERROR" "Failure during bitbake configuration setup.")
+    "$CONFIG_FILES" -c "exit 0" || \
+  {
+    cleanup
+    echo "ERROR: Failure during bitbake configuration setup."
+    return 1
+  }
 
   # parse and generate kas configuration
-  log "INFO" "Generating temporary kas configuration."
+  echo "INFO: Generating temporary kas configuration."
   kas -l error dump \
     --skip repo_setup_loop \
     --skip finish_setup_repos \
     --skip repos_checkout \
     --skip repos_apply_patches \
-    "$CONFIG_FILES" > .config.yaml || (cleanup && log "ERROR" "Failure while parsing kas configuration.")
+    "$CONFIG_FILES" > .config.yaml || \
+  {
+    cleanup 
+    echo "ERROR: Failure while parsing kas configuration."
+    return 1
+  }
 
-  log "INFO" "Exporting environment variables from kas configuration."
-  eval "$(parse_env_vars .config.yaml)" || (cleanup && log "ERROR" "Failure during environment variable setup.")
+  echo "INFO: Exporting environment variables from kas configuration."
+  eval "$(parse_env_vars .config.yaml)" || \
+  {
+    cleanup 
+    echo "ERROR: Failure during environment variable setup."
+    return 1
+  }
 
-  log "INFO" "Cleaning up temporary contents."
+  echo "INFO: Cleaning up temporary contents."
   cleanup
 
-  log "INFO" "Initializing bitbake environment."
+  echo "INFO: Initializing bitbake environment."
   # switch to oe-core directory, so oe-init-build-env can figure out OEROOT correctly
   set -- "$PWD/build"
   cd  "${PWD}/oe-core"
