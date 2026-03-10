@@ -1,0 +1,70 @@
+name: Run kas for a specific build configuration
+inputs:
+  machine:
+    required: true
+  distro_yaml:
+    required: true
+  kas:
+    required: true
+  tag:
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Clone meta-qcom-releases
+      id: clone
+      shell: bash
+      run: |
+        echo "Processing tag: $INPUTS_TAG"
+        
+        BUILD_DIR="build-$INPUTS_TAG"
+        mkdir -p "$BUILD_DIR"
+        cd "$BUILD_DIR"
+        
+        echo "Cloning meta-qcom-releases repository with branch: $INPUTS_TAG"
+        if ! git clone https://github.com/qualcomm-linux/meta-qcom-releases -b "$INPUTS_TAG" meta-qcom-releases; then
+          echo "Error: Failed to clone branch $INPUTS_TAG from meta-qcom-releases"
+          echo "Available branches:"
+          git ls-remote --heads https://github.com/qualcomm-linux/meta-qcom-releases
+          exit 1
+        fi
+        
+        if [ ! -f meta-qcom-releases/lock.yml ]; then
+          echo "Error: lock.yml not found in meta-qcom-releases for branch $INPUTS_TAG"
+          exit 1
+        fi
+        
+        echo "build_dir=$BUILD_DIR" >> $GITHUB_OUTPUT
+      env:
+        INPUTS_TAG: ${{ inputs.tag }}
+
+    - name: Copy lock.yml
+      shell: bash
+      run: |
+        cd "$BUILD_DIR"
+        
+        echo "Copying lock.yml for tag: $INPUTS_TAG"
+        $KAS checkout meta-qcom-releases/lock.yml
+        
+        cp meta-qcom-releases/lock.yml meta-qcom/ci/lock.yml
+      env:
+        KAS: ${{ inputs.kas }}
+        INPUTS_TAG: ${{ inputs.tag }}
+        BUILD_DIR: ${{ steps.clone.outputs.build_dir }}
+
+    - name: Kas build
+      shell: bash
+      run: |
+        cd "$BUILD_DIR"
+        
+        echo "Building for tag: $INPUTS_TAG"
+        $KAS build meta-qcom/ci/$INPUTS_MACHINE.yml:meta-qcom/ci/$INPUTS_DISTRO_YAML:meta-qcom/ci/lock.yml
+        
+        echo "Completed build for tag: $INPUTS_TAG"
+      env:
+        INPUTS_MACHINE: ${{ inputs.machine }}
+        INPUTS_DISTRO_YAML: ${{ inputs.distro_yaml }}
+        KAS: ${{ inputs.kas }}
+        INPUTS_TAG: ${{ inputs.tag }}
+        BUILD_DIR: ${{ steps.clone.outputs.build_dir }}

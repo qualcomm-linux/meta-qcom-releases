@@ -1,0 +1,18 @@
+name: Weekly Build
+
+on:
+  workflow_dispatch:
+  schedule:
+  # NOTE - changes to the cron spec should be pushed by https://github.com/quic-yocto-ci
+  # so that build notification emails will be sent out properly.
+  - cron: "30 11 * * 0"   # weekly job - Run at 11:30 UTC every Sunday
+
+permissions:
+  checks: write
+  pull-requests: write
+  contents: read
+  packages: read
+
+jobs:
+  build-weekly:
+    uses: ./.github/workflows/build-yocto.yml

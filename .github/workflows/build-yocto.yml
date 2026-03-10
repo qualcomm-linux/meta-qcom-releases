@@ -1,0 +1,65 @@
+name: Build Yocto
+
+on:
+  workflow_call:
+    inputs:
+      release_tags:
+        description: 'Comma separated tag values'
+        type: string
+        required: false
+        default: ""
+
+jobs:
+  prepare:
+    if: github.repository_owner == 'qualcomm-linux'
+    runs-on: [self-hosted, qcom-u2404, amd64]
+    outputs:
+      tags: ${{ steps.fetch_tags.outputs.tags_json }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch tags to build
+        id: fetch_tags
+        shell: bash
+        run: |
+          if [[ -n "$RELEASE_TAGS" ]]; then
+            TAGS=$(echo "$RELEASE_TAGS" | tr ',' '\n' | xargs -I{} echo "{}" | sort -V)
+          else
+            git fetch --tags
+            TAGS=$(git tag --sort=v:refname)
+          fi
+          TAGS_JSON=$(echo "$TAGS" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "tags_json=$TAGS_JSON" >> $GITHUB_OUTPUT
+        env:
+          RELEASE_TAGS: ${{ inputs.release_tags }}
+
+  compile:
+    needs: prepare
+    if: github.repository_owner == 'qualcomm-linux'
+    runs-on: [self-hosted, qcom-u2404, amd64]
+    strategy:
+      fail-fast: false
+      matrix:
+        tag: ${{ fromJson(needs.prepare.outputs.tags) }}
+    name: Build ${{ matrix.tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set env variables
+        run: |
+          mkdir -p kas-work
+          echo "KAS_CONTAINER=$PWD/kas-work/kas-container" >> $GITHUB_ENV
+
+      - name: Setup kas-container
+        run: |
+          LATEST=$(git ls-remote --tags --refs --sort="v:refname" https://github.com/siemens/kas | tail -n1 | sed 's/.*\///')
+          wget -qO ${KAS_CONTAINER} https://raw.githubusercontent.com/siemens/kas/refs/tags/$LATEST/kas-container
+          chmod +x ${KAS_CONTAINER}
+
+      - name: Run kas build for tag ${{ matrix.tag }}
+        uses: ./.github/actions/compile
+        with:
+          machine: rb3gen2-core-kit
+          distro_yaml: qcom-distro-prop-image.yml
+          kas: ${{ env.KAS_CONTAINER }}
+          tag: ${{ matrix.tag }}
