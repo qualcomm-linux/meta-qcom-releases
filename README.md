@@ -4,6 +4,9 @@ This repository holds the kas lock files for meta-qcom milestone releases.
 
 Each milestone release is tagged uniquely and tag follows the format `qli-<version>`
 
+For information on the features supported by each milestone release, refer to the
+[Software Release Notes](https://docs.qualcomm.com/doc/80-80021-300/topic/introduction.html?product=895724676033554725).
+
 ## Host requirements
 
 * Configuration
@@ -29,7 +32,7 @@ Each milestone release is tagged uniquely and tag follows the format `qli-<versi
 Code compilation on a VM is a slow process and can take a few hours. Qualcomm
 recommends using an Ubuntu host computer for compilation. To set up a virtual
 machine (VM) running Ubuntu 22.04 on Microsoft® Windows® or Apple® macOS®,
-see Qualcomm Linux Virtual Machine Setup Guide.
+see Qualcomm Linux [Virtual Machine Setup Guide](https://docs.qualcomm.com/doc/80-80021-41/topic/vm-landing-page.html?product=895724676033554725).
 
 ## Build Instructions
 
@@ -65,7 +68,7 @@ artifacts:
     ls -al rootfs.img
     ```
 
-For more info, please refer to the official qualcomm-linux [build guide](https://docs.qualcomm.com/doc/80-70022-254/topic/build_landing_page.html?product=895724676033554725&version=1.6)
+For more info, please refer to the official Qualcomm Linux [Build Guide](https://docs.qualcomm.com/doc/80-80021-254/topic/build_landing_page.html?product=895724676033554725).
 
 ## Getting in Contact
 
