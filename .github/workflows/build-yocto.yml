@@ -16,7 +16,7 @@ jobs:
     outputs:
       tags: ${{ steps.fetch_tags.outputs.tags_json }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Fetch tags to build
         id: fetch_tags
@@ -43,7 +43,7 @@ jobs:
         tag: ${{ fromJson(needs.prepare.outputs.tags) }}
     name: Build ${{ matrix.tag }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set env variables
         run: |
