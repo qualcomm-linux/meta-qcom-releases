@@ -60,6 +60,6 @@ jobs:
         uses: ./.github/actions/compile
         with:
           machine: rb3gen2-core-kit
-          distro_yaml: qcom-distro-prop-image.yml
+          distro_yaml: qcom-distro.yml
           kas: ${{ env.KAS_CONTAINER }}
           tag: ${{ matrix.tag }}
