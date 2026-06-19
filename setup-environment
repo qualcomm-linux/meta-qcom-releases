@@ -158,6 +158,20 @@ init_env() {
   }
   export KAS_BUILD_DIR
 
+  # parse and generate kas configuration
+  echo "INFO: Generating temporary kas configuration."
+  kas -l error dump \
+    --skip repo_setup_loop \
+    --skip finish_setup_repos \
+    --skip repos_checkout \
+    --skip repos_apply_patches \
+    "$CONFIG_FILES" > .config.yaml || \
+  {
+    cleanup
+    echo "ERROR: Failure while parsing kas configuration."
+    return 1
+  }
+
   # invoking kas shell should auto-generate BitBake configuration
   # based on the kas local_conf_header
   echo "INFO: Setting up bitbake configuration."
@@ -170,20 +184,6 @@ init_env() {
   {
     cleanup
     echo "ERROR: Failure during bitbake configuration setup."
-    return 1
-  }
-
-  # parse and generate kas configuration
-  echo "INFO: Generating temporary kas configuration."
-  kas -l error dump \
-    --skip repo_setup_loop \
-    --skip finish_setup_repos \
-    --skip repos_checkout \
-    --skip repos_apply_patches \
-    "$CONFIG_FILES" > .config.yaml || \
-  {
-    cleanup
-    echo "ERROR: Failure while parsing kas configuration."
     return 1
   }
 
