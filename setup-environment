@@ -161,10 +161,6 @@ init_env() {
   # parse and generate kas configuration
   echo "INFO: Generating temporary kas configuration."
   kas -l error dump \
-    --skip repo_setup_loop \
-    --skip finish_setup_repos \
-    --skip repos_checkout \
-    --skip repos_apply_patches \
     "$CONFIG_FILES" > .config.yaml || \
   {
     cleanup
@@ -174,12 +170,9 @@ init_env() {
 
   # invoking kas shell should auto-generate BitBake configuration
   # based on the kas local_conf_header
+  echo "WARNING: The workspace repositories will be reset to their initial state and patches will be applied."
   echo "INFO: Setting up bitbake configuration."
   kas -l error shell \
-    --skip repo_setup_loop \
-    --skip finish_setup_repos \
-    --skip repos_checkout \
-    --skip repos_apply_patches \
     "$CONFIG_FILES" -c "exit 0" || \
   {
     cleanup
