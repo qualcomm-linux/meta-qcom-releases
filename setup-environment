@@ -131,6 +131,23 @@ init_env() {
     CONFIG_FILES="$CONFIG_FILES:$KERNEL"
   fi
 
+  case "$CONFIG_FILES" in
+    meta-qcom-extras/*)
+        [ -d meta-qcom-extras ] || \
+        {
+          cleanup
+          echo "ERROR: meta-qcom-extras needs to be part of the workspace"
+          return 1
+        }
+        meta-qcom-extras/setup_extras_config.sh || \
+        {
+          cleanup
+          echo "ERROR: meta-qcom-extras parameters need to be configured"
+          return 1
+        }
+      ;;
+  esac
+
   # Temporary build directory should be in the same path
   # to ensure bblayers.conf relative referencing is consistent
   KAS_BUILD_DIR="$(mktemp -d -p "$PWD")" || \
