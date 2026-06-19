@@ -165,7 +165,7 @@ init_env() {
     --skip repos_apply_patches \
     "$CONFIG_FILES" > .config.yaml || \
   {
-    cleanup 
+    cleanup
     echo "ERROR: Failure while parsing kas configuration."
     return 1
   }
@@ -173,7 +173,7 @@ init_env() {
   echo "INFO: Exporting environment variables from kas configuration."
   eval "$(parse_env_vars .config.yaml)" || \
   {
-    cleanup 
+    cleanup
     echo "ERROR: Failure during environment variable setup."
     return 1
   }
