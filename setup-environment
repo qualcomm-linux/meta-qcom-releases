@@ -114,6 +114,20 @@ cleanup() {
   unset MACHINE DISTRO KERNEL CONFIG_FILES SKIP_SETUP KAS_BUILD_DIR
 }
 
+# Repos synced via 'repo' tool use non-standard remote names instead of
+# 'origin'. Add an 'origin' alias so kas can operate on the meta layers
+# already synced to the workspace.
+ensure_origin_remotes() {
+  for repo_dir in */; do
+    [ -d "${repo_dir}.git" ] || continue
+    git -C "$repo_dir" remote | grep -q '^origin$' && continue
+    remote=$(git -C "$repo_dir" remote | head -1)
+    [ -z "$remote" ] && continue
+    url=$(git -C "$repo_dir" remote get-url "$remote" 2>/dev/null) || continue
+    git -C "$repo_dir" remote add origin "$url"
+  done
+}
+
 init_env() {
   parse_args "$@" || return $?
 
@@ -125,6 +139,9 @@ init_env() {
 
   echo "INFO: Running validation checks."
   validation_checks || return $?
+
+  echo "INFO: Ensuring repos have an 'origin' remote."
+  ensure_origin_remotes
 
   CONFIG_FILES="$MACHINE:$DISTRO"
   if [ -n "$KERNEL" ]; then
