@@ -3,41 +3,17 @@ header:
 repos:
   bitbake:
     branch: '2.18'
-    commit: a2dd9be788274d9c7280be5b1be5eb5c3990cf54
+    commit: 22021758e66737bcf68dfd2b74adc6a0cb1d42d9
     url: https://github.com/openembedded/bitbake
-  meta-audioreach:
-    branch: master
-    commit: 75402c8d1ea1203dcf3a63792161f7d5d93946bb
-    url: https://github.com/AudioReach/meta-audioreach
-  meta-openembedded:
-    branch: wrynose
-    commit: 335045d3fb440cbb6de0716ffd7dd043bbd3f6ad
-    url: https://github.com/openembedded/meta-openembedded
   meta-qcom:
     branch: wrynose
-    commit: abfe047df38500949ead22de6a73b170e6d2d285
+    commit: ef0004df267743cc89d6a09bc724bc99ff541c01
     url: https://github.com/qualcomm-linux/meta-qcom
-  meta-qcom-distro:
-    branch: wrynose
-    commit: 51a70d3dad35d59230974534cd95edbf35b659e2
-    url: https://github.com/qualcomm-linux/meta-qcom-distro
-  meta-security:
-    branch: wrynose
-    commit: 596b966a0d047c2f48cb768821558e918ae0c477
-    url: https://git.yoctoproject.org/meta-security
-  meta-selinux:
-    branch: wrynose
-    commit: f7306d7af4425553684a860df6f6d0ee66efba31
-    url: https://git.yoctoproject.org/meta-selinux
-  meta-updater:
-    branch: wrynose
-    commit: 7fbd0d7d73d4e252ee31e5260e547cbf17945a82
-    url: https://github.com/uptane/meta-updater
-  meta-virtualization:
-    branch: wrynose
-    commit: 052241689a0c419d13e15e83e7ad65dd16fc8ffd
-    url: https://git.yoctoproject.org/git/meta-virtualization
   oe-core:
     branch: wrynose
-    commit: 42fa856a00ac16b2a7a83d7ecfa60a5be192b16c
+    commit: 06dd66e6220e5ce4ed4b9af4d8231ae5f0a8ce80
     url: https://github.com/openembedded/openembedded-core
+  meta-lts-mixins:
+    branch: wrynose/linux-firmware
+    commit: 348a9eaaf3991e2329d0cef14dce23fabaef9191
+    url: https://git.yoctoproject.org/meta-lts-mixins
