@@ -8,6 +8,11 @@ on:
         type: string
         required: false
         default: ""
+      ignore_tags:
+        description: 'Comma separated list of tags to skip'
+        type: string
+        required: false
+        default: ""
 
 jobs:
   prepare:
@@ -23,15 +28,20 @@ jobs:
         shell: bash
         run: |
           if [[ -n "$RELEASE_TAGS" ]]; then
-            TAGS=$(echo "$RELEASE_TAGS" | tr ',' '\n' | xargs -I{} echo "{}" | sort -V)
+            TAGS=$(echo "$RELEASE_TAGS" | tr ',' '\n' | sed 's/[[:space:]]//g' | grep -v '^$' | sort -V)
           else
             git fetch --tags
             TAGS=$(git tag --sort=v:refname)
+          fi
+          if [[ -n "$IGNORE_TAGS" ]]; then
+            IGNORE_LIST=$(echo "$IGNORE_TAGS" | tr ',' '\n' | sed 's/[[:space:]]//g' | grep -v '^$')
+            TAGS=$(echo "$TAGS" | grep -vxF -f <(echo "$IGNORE_LIST") || true)
           fi
           TAGS_JSON=$(echo "$TAGS" | jq -R -s -c 'split("\n") | map(select(length > 0))')
           echo "tags_json=$TAGS_JSON" >> $GITHUB_OUTPUT
         env:
           RELEASE_TAGS: ${{ inputs.release_tags }}
+          IGNORE_TAGS: ${{ inputs.ignore_tags }}
 
   compile:
     needs: prepare

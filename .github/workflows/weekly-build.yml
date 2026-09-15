@@ -2,6 +2,12 @@ name: Weekly Build
 
 on:
   workflow_dispatch:
+    inputs:
+      ignore_tags:
+        description: 'Comma separated list of tags to skip'
+        type: string
+        required: false
+        default: "qli-2.0-rc1,qli-2.0-rc2"
   schedule:
   # NOTE - changes to the cron spec should be pushed by https://github.com/quic-yocto-ci
   # so that build notification emails will be sent out properly.
@@ -16,3 +22,5 @@ permissions:
 jobs:
   build-weekly:
     uses: ./.github/workflows/build-yocto.yml
+    with:
+      ignore_tags: ${{ inputs.ignore_tags || 'qli-2.0-rc1,qli-2.0-rc2' }}
