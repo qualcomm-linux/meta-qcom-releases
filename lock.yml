@@ -7,7 +7,7 @@ repos:
     url: https://github.com/openembedded/bitbake
   meta-qcom:
     branch: wrynose
-    commit: c37438de1339058055ed23fa346ffe7332d1cb4a
+    commit: ea0fdcc27decd59c3e9bc81dcacf9c5f9a65a062
     url: https://github.com/qualcomm-linux/meta-qcom
   oe-core:
     branch: wrynose
