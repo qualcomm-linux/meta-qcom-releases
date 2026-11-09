@@ -7,7 +7,7 @@ repos:
     url: https://github.com/openembedded/bitbake
   meta-qcom:
     branch: wrynose
-    commit: ea0fdcc27decd59c3e9bc81dcacf9c5f9a65a062
+    commit: b094cfccc192d8e02809bf87c6dd9c76bcf31330
     url: https://github.com/qualcomm-linux/meta-qcom
   oe-core:
     branch: wrynose
@@ -15,7 +15,7 @@ repos:
     url: https://github.com/openembedded/openembedded-core
   meta-lts-mixins:
     branch: wrynose/linux-firmware
-    commit: 8bfc4ae8cf7fc835a23d7a27830f866617d9808f
+    commit: 71dfb81bd98f59ca2127d39b100ecbb8ce1e0ba3
     patches:
       shirka-wlan-fw:
         path: patches/linux-firmware-mixin/0001-linux-firmware-backport-shikra-wlan-firmware-support.patch
